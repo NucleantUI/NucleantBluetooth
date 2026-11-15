@@ -1,0 +1,105 @@
+# The BluetoothScanner demo as an iOS app (device and simulator) — the same
+# sources the demo package's `BluetoothScanner` executable builds
+# (`../Sources/BluetoothScanner`), unchanged. Regenerate the .xcodeproj after
+# editing this:
+#
+#     cd Demo/Xcode && xcodegen
+name: BluetoothScanner
+options:
+  bundleIdPrefix: org.nucleantui
+  # NucleantBluetooth's Package.swift is the source of truth for the minimum.
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "26.0"
+  # Xcode would otherwise add a scheme per package target as well.
+  postGenCommand: >-
+    mkdir -p BluetoothScanner.xcodeproj/project.xcworkspace/xcshareddata &&
+    printf '%s\n'
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
+    '<plist version="1.0">'
+    '<dict>'
+    '	<key>IDEWorkspaceSharedSettings_AutocreateContextsIfNeeded</key>'
+    '	<false/>'
+    '</dict>'
+    '</plist>'
+    > BluetoothScanner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+packages:
+  # The package the demo is for.
+  NucleantBluetooth:
+    path: ../..
+  # The same releases NucleantBluetooth builds against.
+  NucleantUI:
+    url: https://github.com/NucleantUI/NucleantUI.git
+    minorVersion: 0.3.1
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    ENABLE_USER_SCRIPT_SANDBOXING: "YES"
+
+targets:
+  BluetoothScannerApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: ../Sources/BluetoothScanner
+    dependencies:
+      - package: NucleantBluetooth
+        product: NucleantBluetooth
+      - package: NucleantUI
+        product: NucleantUI
+    settings:
+      base:
+        PRODUCT_NAME: BluetoothScanner
+        PRODUCT_BUNDLE_IDENTIFIER: org.nucleantui.BluetoothScanner
+        # Signs to run locally: all the simulator needs. A device needs a
+        # team — Signing & Capabilities in Xcode, or DEVELOPMENT_TEAM here.
+        # On the target, because xcodegen's application preset puts
+        # `CODE_SIGN_IDENTITY = "iPhone Developer"` there, above any
+        # project-level value.
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_IDENTITY: "-"
+        "CODE_SIGN_IDENTITY[sdk=iphoneos*]": "Apple Development"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: "NO"
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: "NO"
+        # MoltenVK and the other dynamic frameworks from the packages'
+        # binary targets; Xcode embeds them here.
+        LD_RUNPATH_SEARCH_PATHS:
+          - $(inherited)
+          - "@executable_path/Frameworks"
+    info:
+      path: Support/Info.plist
+      properties:
+        CFBundleDisplayName: BT Scanner
+        # What iOS shows when it asks for Bluetooth; without it, the app is
+        # stopped the moment it makes its BluetoothManager.
+        NSBluetoothAlwaysUsageDescription: >-
+          The scanner lists the Bluetooth devices around you and connects to
+          the ones you pick, to show their services and values.
+        # A scene manifest with no delegate class named: NucleantUI's
+        # `_AppLaunchDelegate` answers with its own scene delegate, so the
+        # app's `@main` stays plain `NucleantApp`.
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        # As NucleantUI's own examples: the window takes the whole screen.
+        UIStatusBarHidden: true
+        UIViewControllerBasedStatusBarAppearance: false
+        UIRequiresFullScreen: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    scheme:
+      testTargets: []
+      gatherCoverageData: false

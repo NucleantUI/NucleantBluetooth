@@ -60,3 +60,14 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# NucleantBluetooth
+#
+# Not tracked in any Nucleant package: each consumer resolves its own graph.
+Package.resolved
+
+# Xcode's schemes for the package, made when it opens Package.swift.
+.swiftpm/
+
+# Finder.
+.DS_Store
