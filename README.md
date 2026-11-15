@@ -69,7 +69,11 @@ xcodebuild test -scheme NucleantBluetooth -destination 'platform=iOS Simulator,n
 
 `-skipMacroValidation` and `-skipPackagePluginValidation` stand in for Xcode's *Trust & Enable* prompts, for NucleantUI's macros and for PureSwift's code-generating build plugin. The tests cover the manager's state and scanning, the environment value, how CoreBluetooth's values map to NucleantBluetooth's, and the advertising data and identifiers Android hands over. The simulator has no Bluetooth, so finding and connecting to devices needs a real device.
 
-The Android emulator does have Bluetooth: netsim, a virtual radio. [Bumble](https://github.com/google/bumble) can put fake peripherals on it, which the emulator finds and connects to like real ones.
+The Android emulator does have Bluetooth: netsim, a virtual radio. [tools/android_emulator/emulator-ble-server](tools/android_emulator/emulator-ble-server) puts fake peripherals on it with [Bumble](https://github.com/google/bumble), which the emulator finds and connects to like real ones. A heart rate strap, a thermometer that indicates, beacons, a UART console, a test bench of refused reads and writes, devices that drop the connection or leave range, and a crowd, each with a signal that behaves its own way. With the emulator running:
+
+```sh
+cd tools/android_emulator/emulator-ble-server && uv run emulator-ble-server
+```
 
 ## Demo
 
