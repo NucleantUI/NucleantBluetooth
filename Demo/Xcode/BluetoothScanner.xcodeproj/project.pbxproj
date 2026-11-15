@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		43AF4CB7E6EA7FA761ED735E /* BluetoothScannerApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BluetoothScannerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		43AF4CB7E6EA7FA761ED735E /* BluetoothScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BluetoothScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B6A3EBFBE5F3D066D02F45E /* NucleantBluetooth */ = {isa = PBXFileReference; lastKnownFileType = folder; name = NucleantBluetooth; path = ../..; sourceTree = SOURCE_ROOT; };
 		6AB88FEA0D452FB0D18F1677 /* BluetoothScannerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothScannerApp.swift; sourceTree = "<group>"; };
 		6C021D730D509C7E939B96D0 /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
@@ -49,7 +49,7 @@
 		8B8A40363C738CA342AC42F5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				43AF4CB7E6EA7FA761ED735E /* BluetoothScannerApp.app */,
+				43AF4CB7E6EA7FA761ED735E /* BluetoothScanner.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -94,7 +94,7 @@
 				D43685AB0556955A2E168EFF /* NucleantUI */,
 			);
 			productName = BluetoothScannerApp;
-			productReference = 43AF4CB7E6EA7FA761ED735E /* BluetoothScannerApp.app */;
+			productReference = 43AF4CB7E6EA7FA761ED735E /* BluetoothScanner.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -107,7 +107,6 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					17F2957570C457DE09E18E65 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -214,7 +213,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = U7AZRR7LN3;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -300,7 +299,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = U7AZRR7LN3;
 				INFOPLIST_FILE = Support/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

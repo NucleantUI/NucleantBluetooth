@@ -71,3 +71,8 @@ Package.resolved
 
 # Finder.
 .DS_Store
+
+# Python tools (tools/): like Package.resolved, each checkout resolves its own.
+uv.lock
+.venv/
+__pycache__/
