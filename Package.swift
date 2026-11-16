@@ -22,6 +22,23 @@ func nucleantUI() -> Package.Dependency {
     return .package(url: "https://github.com/NucleantUI/NucleantUI.git", .upToNextMinor(from: "0.3.1"))
 }
 
+/// Android is a cross-compile, and Package.swift is evaluated by the host
+/// toolchain, so `#if os(Android)` here would describe the build machine.
+/// The same signal every Nucleant package reads: SWIFT_ANDROID_HOME or
+/// ANDROID_BUILD, both set by nucleant's Gradle build.
+let isAndroid = ProcessInfo.processInfo.environment["SWIFT_ANDROID_HOME"] != nil
+    || ProcessInfo.processInfo.environment["ANDROID_BUILD"] != nil
+
+/// Android's central calls android.bluetooth through swift-java: the same
+/// requirement as NucleantApplication's, so the two resolve together.
+let swiftJava: [Package.Dependency] = isAndroid
+    ? [.package(url: "https://github.com/swiftlang/swift-java", from: "0.4.2")]
+    : []
+
+let swiftJavaProduct: [Target.Dependency] = isAndroid
+    ? [.product(name: "SwiftJava", package: "swift-java")]
+    : []
+
 let package = Package(
     name: "NucleantBluetooth",
     platforms: [
@@ -37,7 +54,7 @@ let package = Package(
         // GAP advertising data and GATT definitions. `Metadata` adds the
         // assigned-numbers names (`uuid.metadata?.name`, `company.name`).
         .package(url: "https://github.com/PureSwift/Bluetooth.git", from: "8.2.1", traits: ["Metadata"]),
-    ],
+    ] + swiftJava,
     targets: [
         .target(
             name: "NucleantBluetooth",
@@ -46,7 +63,7 @@ let package = Package(
                 .product(name: "BluetoothGAP", package: "Bluetooth"),
                 .product(name: "BluetoothGATT", package: "Bluetooth"),
                 .product(name: "NucleantUI", package: "NucleantUI"),
-            ]
+            ] + swiftJavaProduct
         ),
         .testTarget(
             name: "NucleantBluetoothTests",

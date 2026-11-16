@@ -21,7 +21,43 @@ Use the classes on the main thread. The system's answers arrive there too.
 
 ## Platforms
 
-**iOS**, over CoreBluetooth. macOS, Linux and Android are still to come. Each will get its own `BluetoothCentral+<Platform>.swift` behind the same API.
+- **iOS**, over CoreBluetooth.
+- **Android**, over `android.bluetooth` through [swift-java](https://github.com/swiftlang/swift-java).
+
+macOS and Linux are still to come. Each platform has its own `BluetoothCentral+<Platform>.swift` behind the same API.
+
+### Android
+
+Android's callbacks come through abstract Java classes, which Swift can't subclass. [Android/java](Android/java) has a small Java helper for each one, and the app compiles them with its own Java. In a [nucleant](https://github.com/NucleantUI/NucleantProject) project, the app needs three things:
+
+1. **The Java**, through `include_files` in nucleant.toml:
+
+   ```toml
+   include_files = [
+       ["gradle/app/src/main/java/org/nucleantui", "<path to NucleantBluetooth>/Android/java/org/nucleantui/bluetooth"]
+   ]
+   ```
+
+2. **The permissions**, in nucleant.toml's `permissions`:
+
+   ```toml
+   permissions = ["BLUETOOTH_SCAN", "BLUETOOTH_CONNECT", "ACCESS_FINE_LOCATION", "BLUETOOTH", "BLUETOOTH_ADMIN"]
+   ```
+
+   Android only hands scan results to an app with precise location. From Android 12 (API 31) that is waived when BLUETOOTH_SCAN is declared with `android:usesPermissionFlags="neverForLocation"` in the manifest. The central checks which way the app declared it and asks for what is needed when it starts: Nearby devices, plus location unless it is waived. Until they are given, `state` is `.unauthorized`. With location needed, the device's location setting has to be on as well.
+
+3. **The provider**, inside `<application>` in AndroidManifest.tmpl.xml. Android creates it with the app, and it hands the central the app's Context and the Activity in front, which the permissions are asked on:
+
+   ```xml
+   <provider
+       android:name="org.nucleantui.bluetooth.BluetoothAppContext"
+       android:authorities="${applicationId}.nucleantbluetooth"
+       android:exported="false" />
+   ```
+
+Android names a device by its address, so a peripheral's `id` is the address in the last six bytes of a UUID: `00000000-0000-0000-0000-AABBCCDDEEFF`. A connection takes one request at a time, so the central queues reads, writes and notification changes and sends each one when the last is answered. Android discovers the characteristics together with the services, so `discoverCharacteristics(_:)` lists them right away. Android also stops an app's scans for a while when they are started more than five times in 30 seconds.
+
+PureSwift's names (`uuid.metadata?.name`, `companyIdentifier.name`) are read from its resource bundle, which `Bundle.module` can't find in an Android app on its own. The central points `Bundle.main` at the directory nucleant unpacks the bundles into (`NUCLEANT_APP_PATH`, through `CFProcessPath`) before anything reads it.
 
 ## Tests
 
@@ -31,7 +67,13 @@ The tests run in the iOS Simulator:
 xcodebuild test -scheme NucleantBluetooth -destination 'platform=iOS Simulator,name=iPhone 17' -skipMacroValidation -skipPackagePluginValidation
 ```
 
-`-skipMacroValidation` and `-skipPackagePluginValidation` stand in for Xcode's *Trust & Enable* prompts, for NucleantUI's macros and for PureSwift's code-generating build plugin. The tests cover the manager's state and scanning, the environment value, and how CoreBluetooth's values map to NucleantBluetooth's. The simulator has no Bluetooth, so finding and connecting to devices needs a real device.
+`-skipMacroValidation` and `-skipPackagePluginValidation` stand in for Xcode's *Trust & Enable* prompts, for NucleantUI's macros and for PureSwift's code-generating build plugin. The tests cover the manager's state and scanning, the environment value, how CoreBluetooth's values map to NucleantBluetooth's, and the advertising data and identifiers Android hands over. The simulator has no Bluetooth, so finding and connecting to devices needs a real device.
+
+The Android emulator does have Bluetooth: netsim, a virtual radio. [tools/android_emulator/emulator-ble-server](tools/android_emulator/emulator-ble-server) puts fake peripherals on it with [Bumble](https://github.com/google/bumble), which the emulator finds and connects to like real ones. A heart rate strap, a thermometer that indicates, beacons, a UART console, a test bench of refused reads and writes, devices that drop the connection or leave range, and a crowd, each with a signal that behaves its own way. With the emulator running:
+
+```sh
+cd tools/android_emulator/emulator-ble-server && uv run emulator-ble-server
+```
 
 ## Demo
 
