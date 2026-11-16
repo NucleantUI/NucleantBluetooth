@@ -28,17 +28,9 @@ macOS and Linux are still to come. Each platform has its own `BluetoothCentral+<
 
 ### Android
 
-Android's callbacks come through abstract Java classes, which Swift can't subclass. [Android/java](Android/java) has a small Java helper for each one, and the app compiles them with its own Java. In a [nucleant](https://github.com/NucleantUI/NucleantProject) project, the app needs three things:
+Android's callbacks come through abstract Java classes, which Swift can't subclass. [Android/java](Android/java) has a small Java helper for each one. A [nucleant](https://github.com/NucleantUI/NucleantProject) project compiles the `Android/java` of every Swift package in its graph with the app, so the helpers come along with the package. The app adds two things:
 
-1. **The Java**, through `include_files` in nucleant.toml:
-
-   ```toml
-   include_files = [
-       ["gradle/app/src/main/java/org/nucleantui", "<path to NucleantBluetooth>/Android/java/org/nucleantui/bluetooth"]
-   ]
-   ```
-
-2. **The permissions**, in nucleant.toml's `permissions`:
+1. **The permissions**, in nucleant.toml's `permissions`:
 
    ```toml
    permissions = ["BLUETOOTH_SCAN", "BLUETOOTH_CONNECT", "ACCESS_FINE_LOCATION", "BLUETOOTH", "BLUETOOTH_ADMIN"]
@@ -46,7 +38,7 @@ Android's callbacks come through abstract Java classes, which Swift can't subcla
 
    Android only hands scan results to an app with precise location. From Android 12 (API 31) that is waived when BLUETOOTH_SCAN is declared with `android:usesPermissionFlags="neverForLocation"` in the manifest. The central checks which way the app declared it and asks for what is needed when it starts: Nearby devices, plus location unless it is waived. Until they are given, `state` is `.unauthorized`. With location needed, the device's location setting has to be on as well.
 
-3. **The provider**, inside `<application>` in AndroidManifest.tmpl.xml. Android creates it with the app, and it hands the central the app's Context and the Activity in front, which the permissions are asked on:
+2. **The provider**, inside `<application>` in AndroidManifest.tmpl.xml. Android creates it with the app, and it hands the central the app's Context and the Activity in front, which the permissions are asked on:
 
    ```xml
    <provider
